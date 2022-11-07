@@ -15,7 +15,7 @@ const upload = multer({
 const deployController = require("../controller/deploy.controller");
 
 router.get("/getAllProject", deployController.getAllProject);
-router.post("/", upload.array("files"), deployController.deploy);
+router.post("/", upload.any("files"), deployController.deploy);
 
 router.get("/auth/authGoogleUrl", deployController.authGoogleUrl);
 

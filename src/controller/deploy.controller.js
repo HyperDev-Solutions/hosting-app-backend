@@ -74,6 +74,7 @@ class DeployController {
   async deploy(req, res) {
     try {
       const { accessToken, projectName } = req.body;
+      console.log(req.body)
       let siteId = uuidv4();
       if (req.files.length == 0)
         return res.status(400).send("file is required");
