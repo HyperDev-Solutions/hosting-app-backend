@@ -1,4 +1,5 @@
 const firebaseService = require("../service/firebase.service");
+const googleService = require("../service/google.service");
 const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 const fs = require("fs");
@@ -36,6 +37,35 @@ class DeployController {
       );
       if (!projects) return res.status(400).send("tokent is expired");
       res.status(200).send({ data: projects });
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  }
+
+  async authCallback(req, res) {
+    try {
+      res.status(200).send(req.query);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  }
+
+  async googleToken(req, res) {
+    try {
+      const code = req.query.code;
+      if (!code) return res.status(400).send("code is required");
+
+      const authUrl = await googleService.getTokens(code);
+      res.status(200).send(authUrl);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  }
+
+  async authGoogleUrl(req, res) {
+    try {
+      const authUrl = googleService.googleAuthUrl();
+      res.status(200).send(authUrl);
     } catch (error) {
       res.status(500).send(error.message);
     }
