@@ -8,7 +8,13 @@ exports.getAllProject = function (accessToken) {
         method: "GET",
         headers: { Authorization: `Bearer ${accessToken}` },
       })
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (res.status > 399) {
+            let err = await res.json();
+            reject(err.error);
+          }
+          return res.json();
+        })
         .then((json) => resolve(json.results))
         .catch((err) => reject(err));
     } catch (error) {

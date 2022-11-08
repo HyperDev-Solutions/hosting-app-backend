@@ -57,7 +57,8 @@ class DeployController {
       const projects = await firebaseService.getAllProject(
         accessToken.replace(`Bearer `, "")
       );
-      if (!projects) return res.status(400).send("tokent is expired");
+      if (projects.length == 0)
+        return res.status(400).send({ msg: "no data found" });
       res.status(200).send({ data: projects });
     } catch (error) {
       res.status(error.status | 500).send({ msg: error.message });

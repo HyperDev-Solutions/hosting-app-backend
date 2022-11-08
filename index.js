@@ -1,5 +1,6 @@
 const Express = require("express");
 const cors = require("cors");
+const http = require("http");
 const app = Express();
 const port = process.env.PORT || 8000;
 app.use(cors());
@@ -11,5 +12,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/deploy", deployRout);
+const server = http.createServer(app);
 
-app.listen(port, () => console.log(`run on port ${port}`));
+server.listen(port, () => console.log(`run on port ${port}`));
