@@ -28,7 +28,13 @@ exports.createSite = function (accessToken, projectName, siteId) {
           //   body: JSON.stringify({name:}),
         }
       )
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (res.status > 399) {
+            let err = await res.json();
+            reject(err.error);
+          }
+          return res.json();
+        })
         .then((json) => resolve(json))
         .catch((err) => reject(err));
     } catch (error) {
@@ -59,7 +65,13 @@ exports.createVersion = function (accessToken, siteId) {
           }),
         }
       )
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (res.status > 399) {
+            let err = await res.json();
+            reject(err.error);
+          }
+          return res.json();
+        })
         .then((json) => resolve(json))
         .catch((err) => reject(err));
     } catch (error) {
@@ -79,7 +91,13 @@ exports.populateFile = function (accessToken, versionsName, body) {
           body: JSON.stringify(body),
         }
       )
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (res.status > 399) {
+            let err = await res.json();
+            reject(err.error);
+          }
+          return res.json();
+        })
         .then((json) => resolve(json))
         .catch((err) => reject(err));
     } catch (error) {
@@ -99,7 +117,13 @@ exports.uploadFiles = function (accessToken, url, filesHash, streamFile) {
         },
         body: streamFile,
       })
-        .then((res) => res.text())
+        .then(async (res) => {
+          if (res.status > 399) {
+            let err = await res.json();
+            reject(err.error);
+          }
+          return res.json();
+        })
         .then((json) => resolve(json))
         .catch((err) => reject(err));
     } catch (error) {
@@ -122,7 +146,13 @@ exports.siteStatusUpdate = function (accessToken, versionName) {
           body: JSON.stringify({ status: "FINALIZED" }),
         }
       )
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (res.status > 399) {
+            let err = await res.json();
+            reject(err.error);
+          }
+          return res.json();
+        })
         .then((json) => resolve(json))
         .catch((err) => reject(err));
     } catch (error) {
@@ -144,7 +174,13 @@ exports.releasedVersion = function (accessToken, siteId, versionName) {
           },
         }
       )
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (res.status > 399) {
+            let err = await res.json();
+            reject(err.error);
+          }
+          return res.json();
+        })
         .then((json) => resolve(json))
         .catch((err) => reject(err));
     } catch (error) {

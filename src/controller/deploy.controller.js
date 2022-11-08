@@ -25,6 +25,28 @@ const compressFile = (filePath) => {
   });
 };
 
+const removeBulkFiles = (arrayOffiles) => {
+  if (arrayOffiles.length == 0) return;
+  arrayOffiles.forEach((fileHash) => {
+    if (
+      fs.existsSync(
+        path.join(appRoot.path, "/uploads", `/${fileHash.filename}`)
+      )
+    )
+      fs.unlinkSync(
+        path.join(appRoot.path, "/uploads", `/${fileHash.filename}`)
+      );
+    if (
+      fs.existsSync(
+        path.join(appRoot.path, "/uploads", `/${fileHash.filename}.gz`)
+      )
+    )
+      fs.unlinkSync(
+        path.join(appRoot.path, "/uploads", `/${fileHash.filename}.gz`)
+      );
+  });
+};
+
 class DeployController {
   async getAllProject(req, res) {
     try {
@@ -38,7 +60,7 @@ class DeployController {
       if (!projects) return res.status(400).send("tokent is expired");
       res.status(200).send({ data: projects });
     } catch (error) {
-      res.status(500).send(error.message);
+      res.status(error.status | 500).send({ msg: error.message });
     }
   }
 
@@ -46,7 +68,7 @@ class DeployController {
     try {
       res.status(200).send(req.query);
     } catch (error) {
-      res.status(500).send(error.message);
+      res.status(error.status | 500).send({ msg: error.message });
     }
   }
 
@@ -58,7 +80,7 @@ class DeployController {
       const authUrl = await googleService.getTokens(code);
       res.status(200).send(authUrl);
     } catch (error) {
-      res.status(500).send(error.message);
+      res.status(error.status | 500).send({ msg: error.message });
     }
   }
 
@@ -67,18 +89,23 @@ class DeployController {
       const authUrl = googleService.googleAuthUrl();
       res.status(200).send(authUrl);
     } catch (error) {
-      res.status(500).send(error.message);
+      res.status(error.status | 500).send({ msg: error.message });
     }
   }
 
   async deploy(req, res) {
+    let fileHashMap;
     try {
       const { accessToken, projectName } = req.body;
       let siteId = uuidv4();
-      if (req.files.length == 0)
+      if (!req.files && req.files && req.files.length == 0)
         return res.status(400).send("file is required");
+      if (!req.body.accessToken)
+        return res.status(400).send("accessToken is required");
+      if (!req.body.projectName)
+        return res.status(400).send("projectName is required");
       let bodyFile = { files: null };
-      let fileHashMap = await Promise.all(
+      fileHashMap = await Promise.all(
         req.files.map(async (fileHash) => {
           console.log(fileHash);
           await compressFile(
@@ -99,17 +126,6 @@ class DeployController {
         })
       );
 
-      // await compressFile(
-      //   path.join(appRoot.path, "/uploads", `/${req.file.originalname}`)
-      // );
-      // const fileBuffer = fs.readFileSync(
-      //   path.join(appRoot.path, "/uploads", `/${req.file.originalname}.gz`)
-      // );
-      // const hashSum = crypto.createHash("sha256");
-      // hashSum.update(fileBuffer);
-      // const hex = hashSum.digest("hex");
-      // console.log(hex);
-
       const createSite = await firebaseService.createSite(
         accessToken,
         projectName,
@@ -121,12 +137,6 @@ class DeployController {
         siteId
       );
 
-      // const body = {
-      //   files: {
-      //     "/index.html": hex,
-      //   },
-      // };
-      console.log(createVersion);
       const populateFiles = await firebaseService.populateFile(
         accessToken,
         createVersion.name, //createVersion.name
@@ -160,10 +170,12 @@ class DeployController {
         siteId, //siteId
         siteStatusUpdate.name //siteStatusUpdate.name
       );
-
+      removeBulkFiles(fileHashMap);
       res.status(201).send(createSite);
     } catch (error) {
-      res.status(500).send(error.message);
+      removeBulkFiles(fileHashMap);
+      console.log(error);
+      res.status(error.status | 500).send({ msg: error.message });
     }
   }
 }
