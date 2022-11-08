@@ -16,10 +16,12 @@ const deployController = require("../controller/deploy.controller");
 
 router.get("/getAllProject", deployController.getAllProject);
 router.post("/", upload.array("files"), deployController.deploy);
+router.post("/zip", upload.single("file"), deployController.zip);
 
 router.get("/auth/authGoogleUrl", deployController.authGoogleUrl);
 
 router.get("/auth/callback", deployController.authCallback);
 
 router.get("/auth/googleToken", deployController.googleToken);
+router.get("/auth/getUserProfile", deployController.getUserProfile);
 module.exports = router;

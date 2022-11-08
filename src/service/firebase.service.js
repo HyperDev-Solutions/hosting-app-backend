@@ -125,10 +125,11 @@ exports.uploadFiles = function (accessToken, url, filesHash, streamFile) {
       })
         .then(async (res) => {
           if (res.status > 399) {
-            let err = await res.json();
-            reject(err.error);
+            let err = await res.text();
+            console.log(err);
+            reject({ status: 400, message: err });
           }
-          return res.json();
+          return res.text();
         })
         .then((json) => resolve(json))
         .catch((err) => reject(err));
