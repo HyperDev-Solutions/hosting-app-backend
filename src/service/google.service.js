@@ -1,10 +1,12 @@
 // 'use strict';
 const { google } = require("googleapis");
 const fetch = require("node-fetch");
-const clientId =
-  "782042023810-sf67htcsom14d2q9nqu06v23v84vf34l.apps.googleusercontent.com";
-const clientSecret = "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";
-const redirectUri = "http://localhost:8000/api/deploy/auth/callback";
+
+const googleApiUrl = process.env.GOOGLE_API_URL;
+
+const clientId = process.env.GOOGLE_CLIENT_ID;
+const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const redirectUri = process.env.GOOGLE_CLIENT_REDIRECT_URL;
 const oauth2Client = new google.auth.OAuth2(
   clientId,
   clientSecret,
@@ -15,9 +17,9 @@ const oauth2Client = new google.auth.OAuth2(
    */
 );
 const scopes = [
-  "https://www.googleapis.com/auth/firebase",
-  "https://www.googleapis.com/auth/userinfo.email",
-  "https://www.googleapis.com/auth/userinfo.profile",
+  `${googleApiUrl}/auth/firebase`,
+  `${googleApiUrl}/auth/userinfo.email`,
+  `${googleApiUrl}/auth/userinfo.profile`,
 ];
 
 exports.googleAuthUrl = function () {
@@ -31,16 +33,11 @@ exports.googleAuthUrl = function () {
 exports.getUserProfile = function (accessToken) {
   return new Promise((resolve, reject) => {
     try {
-      fetch("https://www.googleapis.com/userinfo/v2/me", {
+      fetch(`${googleApiUrl}/userinfo/v2/me`, {
         method: "GET",
         headers: { Authorization: `Bearer ${accessToken}` },
       })
         .then(async (res) => {
-          // console.log(res);
-          // if (res.status > 399) {
-          //   let err = await res.json();
-          //   reject(err.error);
-          // }
           return res.json();
         })
         .then((json) => resolve(json))

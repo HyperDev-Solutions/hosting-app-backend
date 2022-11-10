@@ -1,10 +1,11 @@
 // 'use strict';
 const fetch = require("node-fetch");
-
+const firebaselApiUrl = process.env.FIREBASE_API_URL;
+const firebaselHostingUrl = process.env.FIREBASE_HOSTING_URL;
 exports.getAllProject = function (accessToken) {
   return new Promise((resolve, reject) => {
     try {
-      fetch("https://firebase.googleapis.com/v1beta1/projects", {
+      fetch(`${firebaselApiUrl}/v1beta1/projects`, {
         method: "GET",
         headers: { Authorization: `Bearer ${accessToken}` },
       })
@@ -27,7 +28,7 @@ exports.createSite = function (accessToken, projectName, siteId) {
   return new Promise((resolve, reject) => {
     try {
       fetch(
-        `https://firebasehosting.googleapis.com/v1beta1/projects/${projectName}/sites?siteId=${siteId}`,
+        `${firebaselHostingUrl}/v1beta1/projects/${projectName}/sites?siteId=${siteId}`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -52,25 +53,22 @@ exports.createSite = function (accessToken, projectName, siteId) {
 exports.createVersion = function (accessToken, siteId) {
   return new Promise((resolve, reject) => {
     try {
-      fetch(
-        `https://firebasehosting.googleapis.com/v1beta1/sites/${siteId}/versions`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${accessToken}` },
-          body: JSON.stringify({
-            config: {
-              headers: [
-                {
-                  glob: "**",
-                  headers: {
-                    "Cache-Control": "max-age=1800",
-                  },
+      fetch(`${firebaselHostingUrl}/v1beta1/sites/${siteId}/versions`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({
+          config: {
+            headers: [
+              {
+                glob: "**",
+                headers: {
+                  "Cache-Control": "max-age=1800",
                 },
-              ],
-            },
-          }),
-        }
-      )
+              },
+            ],
+          },
+        }),
+      })
         .then(async (res) => {
           if (res.status > 399) {
             let err = await res.json();
@@ -89,14 +87,11 @@ exports.createVersion = function (accessToken, siteId) {
 exports.populateFile = function (accessToken, versionsName, body) {
   return new Promise((resolve, reject) => {
     try {
-      fetch(
-        `https://firebasehosting.googleapis.com/v1beta1/${versionsName}:populateFiles`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${accessToken}` },
-          body: JSON.stringify(body),
-        }
-      )
+      fetch(`${firebaselHostingUrl}/v1beta1/${versionsName}:populateFiles`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify(body),
+      })
         .then(async (res) => {
           if (res.status > 399) {
             let err = await res.json();
@@ -144,7 +139,7 @@ exports.siteStatusUpdate = function (accessToken, versionName) {
     try {
       console.log(versionName);
       fetch(
-        `https://firebasehosting.googleapis.com/v1beta1/${versionName}?update_mask=status`,
+        `${firebaselHostingUrl}/v1beta1/${versionName}?update_mask=status`,
         {
           method: "PATCH",
           headers: {
@@ -173,7 +168,7 @@ exports.releasedVersion = function (accessToken, siteId, versionName) {
     try {
       console.log(versionName);
       fetch(
-        `https://firebasehosting.googleapis.com/v1beta1/sites/${siteId}/releases?versionName=${versionName}`,
+        `${firebaselHostingUrl}/v1beta1/sites/${siteId}/releases?versionName=${versionName}`,
         {
           method: "POST",
           headers: {
