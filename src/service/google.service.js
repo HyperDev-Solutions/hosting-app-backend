@@ -2,7 +2,7 @@
 const { google } = require("googleapis");
 const fetch = require("node-fetch");
 
-const googleApiUrl = process.env.GOOGLE_API_URL;
+const googleApiUrl = "https://www.googleapis.com";
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;

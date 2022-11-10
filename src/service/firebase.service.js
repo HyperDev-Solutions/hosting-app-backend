@@ -1,7 +1,7 @@
 // 'use strict';
 const fetch = require("node-fetch");
-const firebaselApiUrl = process.env.FIREBASE_API_URL;
-const firebaselHostingUrl = process.env.FIREBASE_HOSTING_URL;
+const firebaselApiUrl = "https://firebase.googleapis.com";
+const firebaselHostingUrl = "https://firebasehosting.googleapis.com";
 exports.getAllProject = function (accessToken) {
   return new Promise((resolve, reject) => {
     try {
