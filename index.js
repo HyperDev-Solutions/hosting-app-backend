@@ -23,7 +23,7 @@ mongoose
   })
   .then(() => {
     console.info(`✔️ Database Connected (${uri})`);
-    server.listen(port, () => console.log(`run on port ${port}`));
+    server.listen(process.env.PORT, () => console.log(`run on port ${port}`));
   })
   .catch((err) => {
     console.error(`❌ Server Stopped (listening on PORT : ${port})`);
