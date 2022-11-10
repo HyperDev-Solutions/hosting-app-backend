@@ -113,8 +113,8 @@ class DeployController {
   async deploy(req, res) {
     let fileHashMap;
     try {
-      const { accessToken, projectName } = req.body;
-      let siteId = uuidv4();
+      const { accessToken, projectName, siteName } = req.body;
+      let siteId = siteName || uuidv4();
       if (!req.files && req.files && req.files.length == 0)
         return res.status(400).send("file is required");
       if (!req.body.accessToken)
@@ -207,9 +207,9 @@ class DeployController {
     // return;
     let fileHashMap = [];
     try {
-      const { accessToken, projectName } = req.body;
+      const { accessToken, projectName, siteName } = req.body;
       let bodyFile = { files: null };
-      let siteId = uuidv4();
+      let siteId = siteName || uuidv4();
       if (!req.file) return res.status(400).send("file is required");
       if (!req.body.accessToken)
         return res.status(400).send("accessToken is required");
