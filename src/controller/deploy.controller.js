@@ -210,11 +210,11 @@ class DeployController {
         email: user.email,
         ...createSite,
       });
-      res.status(201).send(createSite);
       fs.rmSync(path.join(appRoot.path, "/uploads", `/${newDir}`), {
         recursive: true,
         force: true,
       });
+      res.status(201).send(createSite);
     } catch (error) {
       fs.rmSync(path.join(appRoot.path, "/uploads", `/${newDir}`), {
         recursive: true,
@@ -349,11 +349,11 @@ class DeployController {
         ...createSite,
       });
       console.log("create record completed");
-      res.status(201).send(createSite);
       fs.rmSync(path.join(appRoot.path, "/uploads", `/${newDir}`), {
         recursive: true,
         force: true,
       });
+      res.status(201).send(createSite);
       console.log("site created completed");
     } catch (error) {
       fs.rmSync(path.join(appRoot.path, "/uploads", `/${newDir}`), {
