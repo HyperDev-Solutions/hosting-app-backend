@@ -137,7 +137,6 @@ exports.uploadFiles = function (accessToken, url, filesHash, streamFile) {
 exports.siteStatusUpdate = function (accessToken, versionName) {
   return new Promise((resolve, reject) => {
     try {
-      console.log(versionName);
       fetch(
         `${firebaselHostingUrl}/v1beta1/${versionName}?update_mask=status`,
         {
@@ -166,7 +165,6 @@ exports.siteStatusUpdate = function (accessToken, versionName) {
 exports.releasedVersion = function (accessToken, siteId, versionName) {
   return new Promise((resolve, reject) => {
     try {
-      console.log(versionName);
       fetch(
         `${firebaselHostingUrl}/v1beta1/sites/${siteId}/releases?versionName=${versionName}`,
         {
