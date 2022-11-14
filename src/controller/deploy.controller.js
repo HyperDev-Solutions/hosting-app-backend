@@ -48,6 +48,13 @@ const removeBulkFiles = (arrayOffiles) => {
   });
 };
 
+const filterArrayForWebFiles = (givenArray) => {
+  if (givenArray.length == 0) return [];
+  return givenArray.filter((itm) => {
+    return itm.slice(-1) != "/";
+  });
+};
+
 const pathCreateMethod = (str) => {
   str = str.split("/");
   str.pop();
@@ -119,7 +126,13 @@ class DeployController {
     const newDir = req.newDir;
     try {
       const { accessToken, projectName, siteName } = req.body;
-      let siteId = siteName || uuidv4();
+      let siteId =
+        siteName == "null" ||
+        siteName === null ||
+        siteName === "" ||
+        siteName === undefined
+          ? uuidv4()
+          : siteName;
       if (!req.files || (req.files && req.files.length == 0))
         return res.status(400).send({ message: "files is required" });
 
@@ -231,7 +244,16 @@ class DeployController {
     try {
       const { accessToken, projectName, siteName } = req.body;
       let bodyFile = { files: null };
-      let siteId = siteName || uuidv4();
+      // res.send({ ...req.body });
+      let siteId =
+        siteName == null ||
+        siteName == "null" ||
+        siteName === "" ||
+        siteName === undefined
+          ? uuidv4()
+          : siteName;
+      // console.log(siteId);
+      // return;
       if (!req.file)
         return res.status(400).send({ message: "file is required" });
       if (!req.body.accessToken)
@@ -248,24 +270,38 @@ class DeployController {
       );
       const zipInstance = new jszip();
       const extrac = await zipInstance.loadAsync(fileContent);
-      const getFiles = Object.keys(extrac.files);
-      console.log("zip extract complete");
+      const getFiles = filterArrayForWebFiles(Object.keys(extrac.files));
+      if (getFiles == 0)
+        return res.status(400).send({ message: "only web files deploy" });
+      // console.log(getFiles);
+      // return;
+
       for (let fileKey of getFiles) {
         const file = extrac.files[fileKey];
 
         let createFolders = pathCreateMethod(file.name);
         if (!!createFolders)
-          fs.mkdirSync(
-            path.join(
-              appRoot.path,
-              "/uploads",
-              `/${newDir}`,
-              `/${createFolders}`
-            ),
-            {
-              recursive: true,
-            }
-          );
+          if (
+            !fs.existsSync(
+              path.join(
+                appRoot.path,
+                "/uploads",
+                `/${newDir}`,
+                `/${createFolders}`
+              )
+            )
+          )
+            fs.mkdirSync(
+              path.join(
+                appRoot.path,
+                "/uploads",
+                `/${newDir}`,
+                `/${createFolders}`
+              ),
+              {
+                recursive: true,
+              }
+            );
 
         fs.writeFileSync(
           path.join(appRoot.path, "/uploads", `/${newDir}`, `/${file.name}`),

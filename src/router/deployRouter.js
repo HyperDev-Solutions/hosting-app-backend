@@ -46,9 +46,19 @@ const uniqueIdGenrator = (req, res, next) => {
 };
 
 const checkMulterErrorMiddleware = (req, res, next) => {
-  if (req.multerError)
-    return res.status(400).send({ message: req.multerError });
-  else next();
+  if (req.multerError) {
+    fs.rm(
+      path.join(appRoot.path, "/uploads", `/${req.newDir}`),
+      {
+        recursive: true,
+        force: true,
+      },
+      (err) => {
+        if (err) console.log(err);
+        return res.status(400).send({ message: req.multerError });
+      }
+    );
+  } else next();
 };
 const deployController = require("../controller/deploy.controller");
 
