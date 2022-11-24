@@ -273,9 +273,6 @@ class DeployController {
       const getFiles = filterArrayForWebFiles(Object.keys(extrac.files));
       if (getFiles == 0)
         return res.status(400).send({ message: "only web files deploy" });
-      // console.log(getFiles);
-      // return;
-
       for (let fileKey of getFiles) {
         const file = extrac.files[fileKey];
 

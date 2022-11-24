@@ -10,9 +10,9 @@ app.use(cors());
 const deployRout = require("./src/router/deployRouter");
 app.use(Express.json());
 
-app.get("/", (req, res) => {
-  res.render("index", { title: "app", message: "hellow" });
-});
+// app.get("/", (req, res) => {
+//   res.render("index", { title: "app", message: "hellow" });
+// });
 
 app.use("/api/deploy", deployRout);
 const server = http.createServer(app);

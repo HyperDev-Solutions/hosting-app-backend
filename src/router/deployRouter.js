@@ -5,7 +5,7 @@ const ValidationMiddleware = require("../middelware/validation.middleware");
 const fs = require("fs");
 const appRoot = require("app-root-path");
 const path = require("path");
-const exceptWebFiles = ["html", "css", "js"];
+const exceptWebFiles = ["html", "css", "js", "gif", "png", "jpg", "jpeg"];
 const exceptZipFiles = ["zip"];
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
