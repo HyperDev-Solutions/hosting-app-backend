@@ -13,6 +13,12 @@ app.use(Express.json());
 // app.get("/", (req, res) => {
 //   res.render("index", { title: "app", message: "hellow" });
 // });
+app.use((req, res, next) => {
+  const startDate = Date.now();
+  req.startDate = startDate;
+  console.log(startDate);
+  next();
+});
 
 app.use("/api/deploy", deployRout);
 const server = http.createServer(app);

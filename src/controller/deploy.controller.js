@@ -239,6 +239,8 @@ class DeployController {
   }
 
   async zip(req, res) {
+    console.log("reachToapiController :", Date.now() - req.startDate);
+    let start = "";
     let fileHashMap = [];
     const newDir = req.newDir;
     try {
@@ -254,6 +256,8 @@ class DeployController {
           : siteName;
       // console.log(siteId);
       // return;
+      start = Date.now();
+      console.log("unzip hash start:", Date.now() - start);
       if (!req.file)
         return res.status(400).send({ message: "file is required" });
       if (!req.body.accessToken)
@@ -268,6 +272,7 @@ class DeployController {
           `/${req.file.originalname}`
         )
       );
+
       const zipInstance = new jszip();
       const extrac = await zipInstance.loadAsync(fileContent);
       const getFiles = filterArrayForWebFiles(Object.keys(extrac.files));
@@ -319,27 +324,39 @@ class DeployController {
         };
         fileHashMap.push({ filename: file.name, hash: hex });
       }
-
+      console.log("unzip hash end:", Date.now() - start);
       console.log("gzip and hash complete");
+      start = Date.now();
+      console.log("createSite firebase Api start:", start);
       const createSite = await firebaseService.createSite(
         accessToken,
         projectName,
         siteId
       );
+      console.log("createSite firebase Api end:", Date.now() - start);
       console.log("createSite");
+
+      start = Date.now();
+      console.log("createVersion firebase Api start:", start);
       const createVersion = await firebaseService.createVersion(
         accessToken,
         siteId
       );
+      console.log("createVersion firebase Api end:", Date.now() - start);
       console.log("createVersion");
 
+      start = Date.now();
+      console.log("populateFiles firebase Api start:", start);
       const populateFiles = await firebaseService.populateFile(
         accessToken,
         createVersion.name, //createVersion.name
         bodyFile
       );
+      console.log("populateFiles firebase Api end:", Date.now() - start);
       console.log("populateFiles completed");
 
+      start = Date.now();
+      console.log("uploadFiles firebase Api start:", start);
       const fileHash = populateFiles.uploadRequiredHashes; //populateFiles.uploadRequiredHashes   []
 
       const url = populateFiles.uploadUrl; //populateFiles.uploadUrl
@@ -363,31 +380,49 @@ class DeployController {
           );
         })
       );
-
+      console.log("uploadFiles firebase Api end:", Date.now() - start);
       console.log("upload Files completed");
+
+      start = Date.now();
+      console.log("siteStatusUpdate firebase Api start:", start);
       const siteStatusUpdate = await firebaseService.siteStatusUpdate(
         accessToken,
         createVersion.name // createVersion.name
       );
+      console.log("siteStatusUpdate firebase Api end:", Date.now() - start);
       console.log("siteStatusUpdate completed");
+
+      start = Date.now();
+      console.log("releasedVersion firebase Api start:", start);
       const releasedVersion = await firebaseService.releasedVersion(
         accessToken,
         siteId, //siteId
         siteStatusUpdate.name //siteStatusUpdate.name
       );
+      console.log("releasedVersion firebase Api end:", Date.now() - start);
       console.log("releasedVersion completed");
+
+      start = Date.now();
+      console.log("getUserProfile google Api start:", start);
       const user = await googleService.getUserProfile(req.body.accessToken);
       await deployModel.User.create({
         email: user.email,
         ...createSite,
       });
+      console.log("getUserProfile google  Api end:", Date.now() - start);
       console.log("create record completed");
+
+      start = Date.now();
+      console.log("remove file Api start:", start);
       fs.rmSync(path.join(appRoot.path, "/uploads", `/${newDir}`), {
         recursive: true,
         force: true,
       });
+      console.log("remove file Api end:", Date.now() - start);
+
       res.status(201).send(createSite);
       console.log("site created completed");
+      console.log("total time consume:", Date.now() - req.startDate);
     } catch (error) {
       fs.rmSync(path.join(appRoot.path, "/uploads", `/${newDir}`), {
         recursive: true,
